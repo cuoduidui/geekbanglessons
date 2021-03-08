@@ -86,10 +86,10 @@ public class DatabaseUserRepository implements UserRepository {
                 for (PropertyDescriptor propertyDescriptor : userBeanInfo.getPropertyDescriptors()) {
                     String fieldName = propertyDescriptor.getName();
                     Class fieldType = propertyDescriptor.getPropertyType();
-                    String methodName = resultSetMethodMappings.get(fieldType);
+                    Method resultSetMethod = resultSetMethodMappings.get(fieldType);
                     // 可能存在映射关系（不过此处是相等的）
                     String columnLabel = mapColumnLabel(fieldName);
-                    Method resultSetMethod = ResultSet.class.getMethod(methodName, String.class);
+//                    Method resultSetMethod = ResultSet.class.getMethod(methodName, String.class);
                     // 通过放射调用 getXXX(String) 方法
                     Object resultValue = resultSetMethod.invoke(resultSet, columnLabel);
                     // 获取 User 类 Setter方法
@@ -132,8 +132,9 @@ public class DatabaseUserRepository implements UserRepository {
                 }
 
                 // Boolean -> boolean
-                String methodName = preparedStatementMethodMappings.get(argType);
-                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
+                //直接缓存方法
+                Method method = preparedStatementMethodMappings.get(argType);
+//                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
                 method.invoke(preparedStatement, i + 1, arg);
             }
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -172,13 +173,12 @@ public class DatabaseUserRepository implements UserRepository {
                 }
 
                 // Boolean -> boolean
-                String methodName = preparedStatementMethodMappings.get(argType);
-                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
+                //直接缓存方法
+                Method method = preparedStatementMethodMappings.get(argType);
+//                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
                 method.invoke(preparedStatement, i + 1, arg);
             }
             int row = preparedStatement.executeUpdate();
-            // 返回一个 POJO List -> ResultSet -> POJO List
-            // ResultSet -> T
             return row;
         } catch (Throwable e) {
             exceptionHandler.accept(e);
@@ -194,15 +194,21 @@ public class DatabaseUserRepository implements UserRepository {
     /**
      * 数据类型与 ResultSet 方法名映射
      */
-    static Map<Class, String> resultSetMethodMappings = new HashMap<>();
+    static Map<Class, Method> resultSetMethodMappings = new HashMap<>();
 
-    static Map<Class, String> preparedStatementMethodMappings = new HashMap<>();
+    static Map<Class, Method> preparedStatementMethodMappings = new HashMap<>();
 
     static {
-        resultSetMethodMappings.put(Long.class, "getLong");
-        resultSetMethodMappings.put(String.class, "getString");
 
-        preparedStatementMethodMappings.put(Long.class, "setLong"); // long
-        preparedStatementMethodMappings.put(String.class, "setString"); //string
+
+        try {
+            resultSetMethodMappings.put(Long.class, ResultSet.class.getMethod("getLong", String.class));
+            resultSetMethodMappings.put(String.class, ResultSet.class.getMethod("getString", String.class));
+            preparedStatementMethodMappings.put(Long.class, PreparedStatement.class.getMethod("setLong", int.class, long.class)); // long
+            preparedStatementMethodMappings.put(String.class, PreparedStatement.class.getMethod("setString", int.class, String.class)); //string
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
     }
 }
