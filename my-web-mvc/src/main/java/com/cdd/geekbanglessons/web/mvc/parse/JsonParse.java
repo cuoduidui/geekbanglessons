@@ -5,5 +5,7 @@ package com.cdd.geekbanglessons.web.mvc.parse;
  * @create 2021-03-02 14:56
  **/
 public interface JsonParse {
-    String parse(Object object);
+    String toJSONString(Object object);
+
+    <T> T parseObject(String json, Class<T> T);
 }

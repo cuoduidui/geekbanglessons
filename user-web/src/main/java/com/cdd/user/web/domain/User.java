@@ -1,22 +1,42 @@
 package com.cdd.user.web.domain;
 
+import org.hibernate.validator.constraints.Length;
+
+import javax.persistence.*;
+import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.util.Objects;
+
+import static javax.persistence.GenerationType.AUTO;
 
 /**
  * 用户领域对象
  *
  * @since 1.0
  */
-public class User {
+@Entity
+@Table(name = "users")
+public class User implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = AUTO)
     private Long id;
 
+    @Column
     private String name;
 
+    @Column
+    @Length(min = 6, max = 32, message = "最长不超过32个字符,最短不少于6个字符")
     private String password;
 
+    @Column
+    @Pattern(message = "请输入正确的邮箱", regexp = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$")
     private String email;
 
+    @Column
+    @Pattern(message = "请输入正确的中国大陆手机号", regexp = "^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$")
+    //regexp:正则表达式 flags: 指定 Pattern.Flag 的数组，表示正则表达式的相关选项
+    //电话号码 正则表达式 https://blog.csdn.net/u012045045/article/details/86602935
     private String phoneNumber;
 
     public Long getId() {

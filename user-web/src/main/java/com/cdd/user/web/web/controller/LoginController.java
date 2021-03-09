@@ -3,18 +3,17 @@ package com.cdd.user.web.web.controller;
 import com.cdd.constants.Constants;
 import com.cdd.datastandard.Response;
 import com.cdd.geekbanglessons.web.mvc.controller.RestController;
+import com.cdd.geekbanglessons.web.mvc.valid.annotation.DataValid;
 import com.cdd.user.web.domain.User;
-import com.cdd.user.web.repository.DatabaseUserRepository;
 import com.cdd.user.web.repository.UserRepository;
-import com.cdd.user.web.sql.DBConnectionManager;
-import com.cdd.user.web.sql.DBConnectionPoolManager;
+import com.cdd.user.web.service.UserService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
@@ -25,6 +24,8 @@ import java.util.ServiceLoader;
  **/
 @Path("/login")
 public class LoginController implements RestController {
+    @Resource(name = "bean/UserService")
+    private UserService userService;
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Throwable {
@@ -34,21 +35,11 @@ public class LoginController implements RestController {
     @Path("/register")
     @GET
     @POST
-    public Response register(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        User user = new User();
-        user.setEmail(getFristData(parameterMap.get("email")));
-        user.setName(getFristData(parameterMap.get("name")));
-        user.setPassword(getFristData(parameterMap.get("password")));
-        user.setPhoneNumber(getFristData(parameterMap.get("phoneNumber")));
-//        String databaseURL = "jdbc:derby:/db/user-platform;create=true";
-//        Connection connection = DriverManager.getConnection(databaseURL);
-//        DBConnectionManager manager = new DBConnectionManager();
-//        manager.setConnection(connection);
-        DBConnectionManager manager = DBConnectionPoolManager.getDBConnectionManager();
-        UserRepository userRepository = new DatabaseUserRepository(manager);
-        boolean isTrue = userRepository.save(user);
-        DBConnectionPoolManager.returnDBConnectionManager(manager);
+    public Response register(@DataValid User user) throws Throwable {
+//        DBConnectionManager manager = DBConnectionPoolManager.getDBConnectionManager();
+//        UserRepository userRepository = new DatabaseUserRepository(manager);
+        boolean isTrue = userService.register(user);
+//        DBConnectionPoolManager.returnDBConnectionManager(manager);
         if (isTrue) {
             return Response.buildSuccessResponse(user);
         }

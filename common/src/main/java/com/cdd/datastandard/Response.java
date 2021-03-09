@@ -35,10 +35,10 @@ public class Response<T> implements java.io.Serializable {
 
     public static <T> Response<T> buildResponse(T data, String code, String msg, String info, boolean success) {
         Response response = new Response();
-        response.setCode(Constants.ResponseCode.SUCCESS);
+        response.setCode(code);
         response.setData(data);
-        response.setInfo(Constants.ResponseInfo.SUCCESS);
-        response.setMsg(Constants.ResponseInfo.SUCCESS);
+        response.setInfo(info);
+        response.setMsg(msg);
         response.setSuccess(success);
         return response;
     }

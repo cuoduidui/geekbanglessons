@@ -1,13 +1,16 @@
 package com.cdd.geekbanglessons.web.mvc;
 
+import com.cdd.datastandard.Response;
+import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
 import com.cdd.geekbanglessons.web.mvc.controller.Controller;
 import com.cdd.geekbanglessons.web.mvc.controller.PageController;
 import com.cdd.geekbanglessons.web.mvc.controller.RestController;
 import com.cdd.geekbanglessons.web.mvc.parse.DefaultJsonParse;
 import com.cdd.geekbanglessons.web.mvc.parse.JsonParse;
+import com.cdd.geekbanglessons.web.mvc.valid.annotation.DataValid;
 import org.apache.commons.lang.StringUtils;
 
-import javax.naming.InitialContext;
+import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -15,13 +18,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -41,6 +48,8 @@ public class FrontControllerServlet extends HttpServlet {
     private Map<String, HandlerMethodInfo> handleMethodInfoMapping = new HashMap<>();
     private JsonParse jsonParse = new DefaultJsonParse();
 
+    private ComponentContext context;
+
     /**
      * 初始化 Servlet
      *
@@ -48,8 +57,12 @@ public class FrontControllerServlet extends HttpServlet {
      */
     @Override
     public void init(ServletConfig servletConfig) {
+        ComponentContext componentContext = new ComponentContext();
+        componentContext.init(servletConfig.getServletContext());
+        context = componentContext;
         initHandleMethods();
         initJsonParse();
+
     }
 
     private void initJsonParse() {
@@ -80,10 +93,31 @@ public class FrontControllerServlet extends HttpServlet {
                 String path = requestPath + pathFromMethod.value();
                 handleMethodInfoMapping.put(path,
                         new HandlerMethodInfo(path, method, supportedHttpMethods));
+                injectComponents(controller, controller.getClass());
                 controllersMapping.put(path, controller);
             }
 
         }
+    }
+
+    private void injectComponents(Object component, Class<?> componentClass) {
+        Stream.of(componentClass.getDeclaredFields())
+                .filter(field -> {
+                    int mods = field.getModifiers();
+                    return !Modifier.isStatic(mods) &&
+                            field.isAnnotationPresent(Resource.class);
+                }).forEach(field -> {
+            Resource resource = field.getAnnotation(Resource.class);
+            String resourceName = resource.name();
+            Object injectedObject = context.getComponent(resourceName);
+            ;
+            field.setAccessible(true);
+            try {
+                // 注入目标对象
+                field.set(component, injectedObject);
+            } catch (IllegalAccessException e) {
+            }
+        });
     }
 
     /**
@@ -167,11 +201,47 @@ public class FrontControllerServlet extends HttpServlet {
                     } else if (controller instanceof RestController) {
                         response.setHeader("Content-type", "application/json;charset=UTF-8");
                         RestController restController = RestController.class.cast(controller);
-                        Object json = method.invoke(restController, request, response);
+                        //todo 可以抽出  参数填充 参数校验
+                        Class<?>[] clazzs = method.getParameterTypes();
+                        Object json = null;
+                        if (null == clazzs || clazzs.length <= 0) {
+                            json = method.invoke(restController);
+                        } else {
+                            Map<String, String[]> parameterMap = request.getParameterMap();
+//                           todo 参数转换 目前只支持一个参数
+                            Class<?> clazz = clazzs[0];
+                            Object object = mapTransformObject(clazz, parameterMap);
+                            Annotation[][] annotations = method.getParameterAnnotations();
+                            Annotation[] annotations1 = annotations[0];
+                            if (annotations1.length > 0) {
+                                Annotation annotation = annotations1[0];
+                                Boolean isTrue = true;
+                                Response responseData = null;
+                                if (annotation.annotationType().equals(DataValid.class)) {
+                                    Validator validator = context.getComponent("bean/Validator");
+                                    Set<ConstraintViolation<Object>> violations = validator.validate(object);
+                                    for (ConstraintViolation<Object> objectConstraintViolation : violations) {
+                                        String msg = objectConstraintViolation.getMessage();
+                                        if (!StringUtils.isEmpty(msg)) {
+                                            isTrue = false;
+                                            responseData = Response.buildFailResponse("D0001", msg, "参数错误");
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!isTrue) {
+                                    json = responseData;
+                                } else {
+                                    json = method.invoke(restController, object);
+                                }
+                            } else {
+                                json = method.invoke(restController, object);
+                            }
+                        }
                         System.out.println("执行方法:" + method.getName() + "返回参数：" + json);
                         PrintWriter printWriter = response.getWriter();
                         //json 框架选择
-                        printWriter.write(jsonParse.parse(json));
+                        printWriter.write(jsonParse.toJSONString(json));
                         printWriter.close();
                     }
                 }
@@ -183,6 +253,16 @@ public class FrontControllerServlet extends HttpServlet {
                 }
             }
         }
+    }
+
+    private <T> T mapTransformObject(Class<T> T, Map<String, String[]> parameterMap) {
+        Map<String, String> parameterObjectMap = new HashMap<>(parameterMap.size(), 1);
+        //简单实现
+        parameterMap.forEach((k, v) -> {
+            parameterObjectMap.put(k, v == null ? null : v[0]);
+        });
+        String json = jsonParse.toJSONString(parameterObjectMap);
+        return jsonParse.parseObject(json, T);
     }
 
 //    private void beforeInvoke(Method handleMethod, HttpServletRequest request, HttpServletResponse response) {

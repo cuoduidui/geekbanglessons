@@ -9,7 +9,13 @@ import com.cdd.geekbanglessons.web.mvc.parse.JsonParse;
  **/
 public class FastJsonParse implements JsonParse {
     @Override
-    public String parse(Object object) {
+    public String toJSONString(Object object) {
+
         return JSON.toJSONString(object);
+    }
+
+    @Override
+    public <T> T parseObject(String json, Class<T> T) {
+        return JSON.parseObject(json, T);
     }
 }
