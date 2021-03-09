@@ -29,3 +29,4 @@ com.cdd.user.web.web.listener.DBConnectionInitializerListener#contextDestroyed �
 
 ​    3、jpa是整合
 
+登录地址:http://127.0.0.1/user-web/hello/register

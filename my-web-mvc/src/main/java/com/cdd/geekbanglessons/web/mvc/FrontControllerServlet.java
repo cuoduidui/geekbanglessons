@@ -10,7 +10,6 @@ import com.cdd.geekbanglessons.web.mvc.parse.JsonParse;
 import com.cdd.geekbanglessons.web.mvc.valid.annotation.DataValid;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -26,9 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -65,6 +62,11 @@ public class FrontControllerServlet extends HttpServlet {
 
     }
 
+    @Override
+    public void destroy() {
+        context.destroy();
+    }
+
     private void initJsonParse() {
         for (JsonParse localJsonParse : ServiceLoader.load(JsonParse.class)) {
             jsonParse = localJsonParse;
@@ -76,48 +78,30 @@ public class FrontControllerServlet extends HttpServlet {
      * 利用 ServiceLoader 技术（Java SPI）
      */
     private void initHandleMethods() {
-        for (Controller controller : ServiceLoader.load(Controller.class)) {
-            Class<?> controllerClass = controller.getClass();
-            Path pathFromClass = controllerClass.getAnnotation(Path.class);
-            String requestPath = pathFromClass.value();
-            Method[] publicMethods = controllerClass.getMethods();
-            // 处理方法支持的 HTTP 方法集合
-            for (Method method : publicMethods) {
-                Set<String> supportedHttpMethods = findSupportedHttpMethods(method);
-                Path pathFromMethod = method.getAnnotation(Path.class);
-                //不打注解的 过滤掉 小马哥写错了
-                if (null == pathFromMethod) {
-                    continue;
+        for (String controllerName : context.getComponentNames()) {
+            Object controller = context.getComponent(controllerName);
+            if (controller instanceof Controller) {
+                Class<?> controllerClass = controller.getClass();
+                Path pathFromClass = controllerClass.getAnnotation(Path.class);
+                String requestPath = pathFromClass.value();
+                Method[] publicMethods = controllerClass.getMethods();
+                // 处理方法支持的 HTTP 方法集合
+                for (Method method : publicMethods) {
+                    Set<String> supportedHttpMethods = findSupportedHttpMethods(method);
+                    Path pathFromMethod = method.getAnnotation(Path.class);
+                    //不打注解的 过滤掉 小马哥写错了
+                    if (null == pathFromMethod) {
+                        continue;
+                    }
+                    // 多个方法的时候 这个地方是错误的
+                    String path = requestPath + pathFromMethod.value();
+                    handleMethodInfoMapping.put(path,
+                            new HandlerMethodInfo(path, method, supportedHttpMethods));
+//                    injectComponents(controller, controller.getClass());
+                    controllersMapping.put(path, (Controller) controller);
                 }
-                // 多个方法的时候 这个地方是错误的
-                String path = requestPath + pathFromMethod.value();
-                handleMethodInfoMapping.put(path,
-                        new HandlerMethodInfo(path, method, supportedHttpMethods));
-                injectComponents(controller, controller.getClass());
-                controllersMapping.put(path, controller);
             }
-
         }
-    }
-
-    private void injectComponents(Object component, Class<?> componentClass) {
-        Stream.of(componentClass.getDeclaredFields())
-                .filter(field -> {
-                    int mods = field.getModifiers();
-                    return !Modifier.isStatic(mods) &&
-                            field.isAnnotationPresent(Resource.class);
-                }).forEach(field -> {
-            Resource resource = field.getAnnotation(Resource.class);
-            String resourceName = resource.name();
-            Object injectedObject = context.getComponent(resourceName);
-            ;
-            field.setAccessible(true);
-            try {
-                // 注入目标对象
-                field.set(component, injectedObject);
-            } catch (IllegalAccessException e) {
-            }
-        });
     }
 
     /**
