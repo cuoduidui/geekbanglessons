@@ -92,8 +92,6 @@ public class ComponentContext {
             injectComponents(component, componentClass);
             // 初始阶段 - {@link PostConstruct}
             processPostConstruct(component, componentClass);
-            // TODO 实现销毁阶段 - {@link PreDestroy}
-            processPreDestroy();
         });
     }
 
@@ -130,10 +128,6 @@ public class ComponentContext {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    private void processPreDestroy() {
-        // TODO
     }
 
     /**
@@ -176,7 +170,7 @@ public class ComponentContext {
         return result;
     }
 
-    protected <C> C lookupComponent(String name) {
+    public <C> C lookupComponent(String name) {
         return executeInContext(context -> (C) context.lookup(name));
     }
 

@@ -203,13 +203,15 @@ public class FrontControllerServlet extends HttpServlet {
                                 Response responseData = null;
                                 if (annotation.annotationType().equals(DataValid.class)) {
                                     Validator validator = context.getComponent("bean/Validator");
-                                    Set<ConstraintViolation<Object>> violations = validator.validate(object);
-                                    for (ConstraintViolation<Object> objectConstraintViolation : violations) {
-                                        String msg = objectConstraintViolation.getMessage();
-                                        if (!StringUtils.isEmpty(msg)) {
-                                            isTrue = false;
-                                            responseData = Response.buildFailResponse("D0001", msg, "参数错误");
-                                            break;
+                                    if (null != validator) {
+                                        Set<ConstraintViolation<Object>> violations = validator.validate(object);
+                                        for (ConstraintViolation<Object> objectConstraintViolation : violations) {
+                                            String msg = objectConstraintViolation.getMessage();
+                                            if (!StringUtils.isEmpty(msg)) {
+                                                isTrue = false;
+                                                responseData = Response.buildFailResponse("D0001", msg, "参数错误");
+                                                break;
+                                            }
                                         }
                                     }
                                 }

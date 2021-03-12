@@ -1,9 +1,12 @@
 package com.cdd.user.web.web.listener;
 
+import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
 import com.cdd.user.web.domain.User;
+import com.cdd.user.web.sql.DBConnectionManager;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.util.logging.Logger;
@@ -18,19 +21,33 @@ public class TestingListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-//        ComponentContext context = ComponentContext.getInstance();
-//        DBConnectionManager dbConnectionManager = context.getComponent("bean/DBConnectionManager");
-//        dbConnectionManager.getConnection();
-//        testUser(dbConnectionManager.getEntityManager());
-//        logger.info("所有的 JNDI 组件名称：[");
-//        context.getComponentNames().forEach(logger::info);
-//        logger.info("]");
+        ComponentContext context = ComponentContext.getInstance();
+        DBConnectionManager dbConnectionManager = context.getComponent("bean/DBConnectionManager");
+        dbConnectionManager.getConnection();
+        testPropertyFromServletContext(sce.getServletContext());
+        testPropertyFromJNDI(context);
+        testUser(dbConnectionManager.getEntityManager());
+        logger.info("所有的 JNDI 组件名称：[");
+        context.getComponentNames().forEach(logger::info);
+        logger.info("]");
+    }
+
+    private void testPropertyFromServletContext(ServletContext servletContext) {
+        String propertyName = "application.name";
+        logger.info("ServletContext Property[" + propertyName + "] : "
+                + servletContext.getInitParameter(propertyName));
+    }
+
+    private void testPropertyFromJNDI(ComponentContext context) {
+        String propertyName = "maxValue";
+        logger.info("JNDI Property[" + propertyName + "] : "
+                + context.lookupComponent(propertyName));
     }
 
     private void testUser(EntityManager entityManager) {
         User user = new User();
         user.setName("小马哥");
-        user.setPassword("*********");
+        user.setPassword("******");
         user.setEmail("mercyblitz@gmail.com");
         user.setPhoneNumber("abcdefg");
         EntityTransaction transaction = entityManager.getTransaction();
