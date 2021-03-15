@@ -36,11 +36,17 @@
         <maven.flatten.version>1.2.5</maven.flatten.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <jolokia.version>1.6.2</jolokia.version>
     </properties>
     <!-- Artifacts 依赖版本管理 -->
     <dependencyManagement>
 
         <dependencies>
+            <dependency>
+                <groupId>org.jolokia</groupId>
+                <artifactId>jolokia-core</artifactId>
+                <version>${jolokia.version}</version>
+            </dependency>
             <!-- Servlet 3.1 API -->
             <dependency>
                 <groupId>javax.servlet</groupId>

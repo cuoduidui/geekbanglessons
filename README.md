@@ -30,3 +30,17 @@ com.cdd.user.web.web.listener.DBConnectionInitializerListener#contextDestroyed �
 ​    3、jpa是整合
 
 登录地址:http://127.0.0.1/user-web/hello/register
+
+## week-03
+
+1、整合jolokia：
+
+​		启动项目后访问：http://localhost/user-web/jolokia/read/java.lang:type=Memory/HeapMemoryUsage 查询内存使用情况
+
+​		自定义bean访问：
+
+​			访问属性：http://localhost/user-web/jolokia/read/com.cdd.user.web.web.Mbean:type=WebContext/ComponentContext
+
+​			操作方法：http://localhost/user-web/jolokia/exec/com.cdd.user.web.web.Mbean:type=WebContext/toString
+
+​			写入属性：http://localhost/user-web/jolokia/write/com.cdd.user.web.web.Mbean:type=WebContext/AppName/user-web
