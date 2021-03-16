@@ -39,8 +39,12 @@ com.cdd.user.web.web.listener.DBConnectionInitializerListener#contextDestroyed �
 
 ​		自定义bean访问：
 
+​			自定义jmx bean（com.cdd.user.web.web.Mbean.WebContext）
+
 ​			访问属性：http://localhost/user-web/jolokia/read/com.cdd.user.web.web.Mbean:type=WebContext/ComponentContext
 
 ​			操作方法：http://localhost/user-web/jolokia/exec/com.cdd.user.web.web.Mbean:type=WebContext/toString
 
 ​			写入属性：http://localhost/user-web/jolokia/write/com.cdd.user.web.web.Mbean:type=WebContext/AppName/user-web
+
+​			查询所有暴露的bean：http://localhost/user-web/jolokia/list
