@@ -1,4 +1,4 @@
-package com.cdd.user.web.configuration.microprofile.config;
+package com.cdd.geekbanglessons.web.mvc.configuration.microprofile.config;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;

@@ -2,6 +2,7 @@ package com.cdd.user.web.web.controller;
 
 import com.cdd.constants.Constants;
 import com.cdd.datastandard.Response;
+import com.cdd.geekbanglessons.web.mvc.configuration.microprofile.config.annotation.ConfigValue;
 import com.cdd.geekbanglessons.web.mvc.controller.RestController;
 import com.cdd.geekbanglessons.web.mvc.valid.annotation.DataValid;
 import com.cdd.user.web.domain.User;
@@ -26,6 +27,17 @@ import java.util.ServiceLoader;
 public class LoginController implements RestController {
     @Resource(name = "bean/UserService")
     private UserService userService;
+    @ConfigValue("appName")
+    private String appNmae;
+    @ConfigValue("appId")
+    private Integer appId;
+
+    @Path("/getWebInfo")
+    @GET
+    @POST
+    public Response getWebInfo() throws Throwable {
+        return Response.buildSuccessResponse("appName: " + appNmae + ", appId: " + appId);
+    }
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Throwable {

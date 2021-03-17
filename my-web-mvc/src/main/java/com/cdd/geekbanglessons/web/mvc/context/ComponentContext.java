@@ -3,12 +3,16 @@ package com.cdd.geekbanglessons.web.mvc.context;
 
 import com.cdd.function.ThrowableAction;
 import com.cdd.function.ThrowableFunction;
+import com.cdd.geekbanglessons.web.mvc.configuration.microprofile.config.DefaultConfigProviderResolver;
+import com.cdd.geekbanglessons.web.mvc.configuration.microprofile.config.annotation.ConfigValue;
+import org.eclipse.microprofile.config.Config;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.naming.*;
 import javax.servlet.ServletContext;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Logger;
@@ -26,6 +30,7 @@ public class ComponentContext {
     private static final Logger logger = Logger.getLogger(CONTEXT_NAME);
 
     private static ServletContext servletContext; // 请注意
+    private static Config config;
     // 假设一个 Tomcat JVM 进程，三个 Web Apps，会不会相互冲突？（不会冲突）
     // static 字段是 JVM 缓存吗？（是 ClassLoader 缓存）
 
@@ -62,9 +67,15 @@ public class ComponentContext {
         servletContext.setAttribute(CONTEXT_NAME, this);
         // 获取当前 ServletContext（WebApp）ClassLoader
         this.classLoader = servletContext.getClassLoader();
+        initConfig();
         initEnvContext();
         instantiateComponents();
         initializeComponents();
+    }
+
+    private void initConfig() {
+        if (config == null)
+            config = new DefaultConfigProviderResolver().getConfig();
     }
 
     /**
@@ -94,24 +105,44 @@ public class ComponentContext {
             processPostConstruct(component, componentClass);
         });
     }
-
+// &&
+//                            (field.isAnnotationPresent(Resource.class) || field.isAnnotationPresent(ConfigValue.class))
     private void injectComponents(Object component, Class<?> componentClass) {
         Stream.of(componentClass.getDeclaredFields())
                 .filter(field -> {
                     int mods = field.getModifiers();
-                    return !Modifier.isStatic(mods) &&
-                            field.isAnnotationPresent(Resource.class);
+                    return !Modifier.isStatic(mods);
                 }).forEach(field -> {
-            Resource resource = field.getAnnotation(Resource.class);
-            String resourceName = resource.name();
-            Object injectedObject = lookupComponent(resourceName);
-            field.setAccessible(true);
-            try {
-                // 注入目标对象
-                field.set(component, injectedObject);
-            } catch (IllegalAccessException e) {
+            if (field.isAnnotationPresent(Resource.class)) {
+                handleResource(component, field);
+            } else if (field.isAnnotationPresent(ConfigValue.class)) {
+                handleResourceConfigValue(component, field);
             }
         });
+    }
+
+    private void handleResourceConfigValue(Object component, Field field) {
+        ConfigValue configValue = field.getAnnotation(ConfigValue.class);
+        String propertyName = configValue.value();
+        Object injectedObject = config.getValue(propertyName, field.getType());
+        field.setAccessible(true);
+        try {
+            // 注入目标对象
+            field.set(component, injectedObject);
+        } catch (IllegalAccessException e) {
+        }
+    }
+
+    void handleResource(Object component, Field field) {
+        Resource resource = field.getAnnotation(Resource.class);
+        String resourceName = resource.name();
+        Object injectedObject = lookupComponent(resourceName);
+        field.setAccessible(true);
+        try {
+            // 注入目标对象
+            field.set(component, injectedObject);
+        } catch (IllegalAccessException e) {
+        }
     }
 
     private void processPostConstruct(Object component, Class<?> componentClass) {

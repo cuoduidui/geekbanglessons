@@ -48,3 +48,11 @@ com.cdd.user.web.web.listener.DBConnectionInitializerListener#contextDestroyed �
 ​			写入属性：http://localhost/user-web/jolokia/write/com.cdd.user.web.web.Mbean:type=WebContext/AppName/user-web
 
 ​			查询所有暴露的bean：http://localhost/user-web/jolokia/list
+
+2、实现Converter、ConfigSource
+
+​	自定义Converter：com.cdd.user.web.web.config.converter.StringToIntegerConverter
+
+​	自定义ConfigSource：com.cdd.user.web.web.config.source.PropertiesConfigSource
+
+​	访问路径：http://localhost/user-web/login/getWebInfo   获取配置文件META-INF/config/config.properties中的appId 和AppName并把appId String 转换成Integer

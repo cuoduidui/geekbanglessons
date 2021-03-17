@@ -1,18 +1,22 @@
 package com.cdd.user.web.web.listener;
 
+import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
 import com.cdd.user.web.web.Mbean.WebContext;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.lang.management.ManagementFactory;
+import java.util.logging.Logger;
 
 /**
  * @author yangfengshan
  * @create 2021-03-15 18:45
  **/
 public class ComponentContextMbeanListener implements ServletContextListener {
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -23,6 +27,7 @@ public class ComponentContextMbeanListener implements ServletContextListener {
             ObjectName objectName = null;
             objectName = new ObjectName("com.cdd.user.web.web.Mbean:type=WebContext");
             mBeanServer.registerMBean(new WebContext(), objectName);
+            testPropertyFromServletContext(sce.getServletContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -31,5 +36,11 @@ public class ComponentContextMbeanListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
 
+    }
+
+    private void testPropertyFromServletContext(ServletContext servletContext) {
+        String propertyName = "application.name";
+        logger.info("ServletContext Property[" + propertyName + "] : "
+                + servletContext.getInitParameter(propertyName));
     }
 }
