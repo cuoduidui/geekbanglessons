@@ -16,6 +16,7 @@ public class JavaSystemPropertiesConfigSource implements ConfigSource {
 
     public JavaSystemPropertiesConfigSource() {
         Map systemProperties = System.getProperties();
+        if (null == systemProperties || systemProperties.isEmpty()) systemProperties = System.getenv();
         this.properties = new HashMap<>(systemProperties);
     }
 
