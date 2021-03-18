@@ -56,3 +56,14 @@ com.cdd.user.web.web.listener.DBConnectionInitializerListener#contextDestroyed �
 ​	自定义ConfigSource：com.cdd.user.web.web.config.source.PropertiesConfigSource
 
 ​	访问路径：http://localhost/user-web/login/getWebInfo   获取配置文件META-INF/config/config.properties中的appId 和AppName并把appId String 转换成Integer
+
+​	增加自定义注解 ConfigValue  在依赖注入时解析并获取到配置信息
+
+```java
+@ConfigValue("appName")
+private String appNmae;
+@ConfigValue("appId")
+private Integer appId;
+```
+
+​	
