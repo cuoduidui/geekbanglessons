@@ -84,6 +84,8 @@ public class ComponentContext {
             // 默认配置源（内建的，静态的）
             configBuilder.addDefaultSources();
             // 通过发现配置源（动态的）
+            configBuilder.addDiscoveredSources();
+            // 通过发现配置源（动态的）
             configBuilder.addDiscoveredConverters();
             // 获取 Config
             Config config = configBuilder.build();

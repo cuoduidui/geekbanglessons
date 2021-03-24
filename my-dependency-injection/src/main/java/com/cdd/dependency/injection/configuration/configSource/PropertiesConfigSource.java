@@ -9,12 +9,12 @@ import java.util.Properties;
 
 public class PropertiesConfigSource extends MapBasedConfigSource {
 
-    protected PropertiesConfigSource() {
+    public PropertiesConfigSource() {
         super("PropertiesConfigSource", 400);
     }
 
     @Override
-    protected void prepareConfigData(Map configData) throws Throwable {
+    public void prepareConfigData(Map configData) throws Throwable {
         Properties properties = new Properties();
         //获取properties文件
         // 使用ClassLoader加载properties配置文件生成对应的输入流

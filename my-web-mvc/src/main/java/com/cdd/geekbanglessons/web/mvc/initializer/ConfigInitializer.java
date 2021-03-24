@@ -29,7 +29,7 @@ public class ConfigInitializer extends AbstractMyWebMvcInitializer {
         // 默认配置源（内建的，静态的）
         configBuilder.addDefaultSources();
         // 通过发现配置源（动态的）
-        configBuilder.addDiscoveredConverters();
+        configBuilder.addDiscoveredSources();
         // 通过发现配置源（动态的）
         configBuilder.addDiscoveredConverters();
         // 增加扩展配置源（基于 Servlet 引擎）
