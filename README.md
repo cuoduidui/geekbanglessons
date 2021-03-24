@@ -56,3 +56,23 @@ com.cdd.user.web.web.listener.DBConnectionInitializerListener#contextDestroyed �
 ​	自定义ConfigSource：com.cdd.user.web.web.config.source.PropertiesConfigSource
 
 ​	访问路径：http://localhost/user-web/login/getWebInfo   获取配置文件META-INF/config/config.properties中的appId 和AppName并把appId String 转换成Integer
+
+### week-04
+
+1、整合my-dependency-injection模块
+
+​	com.cdd.geekbanglessons.web.mvc.initializer.MyWebMvcServletContainerInitializer 自定义ServletContainerInitializer 并通过@HandlesTypes指定自定义初始化接口MyWebMvcInitializer进行配置元信息、依赖注入、Servlet信息注入到Servlet上下文中
+
+com.cdd.geekbanglessons.web.mvc.initializer.FrontControllerServletInitializer  Servlet监听添加
+
+com.cdd.geekbanglessons.web.mvc.initializer.ConfigInitializer 配置信息初始化
+
+com.cdd.geekbanglessons.web.mvc.initializer.ComponentContextInitializer 依赖注入初始化
+
+com.cdd.user.web.web.listener.UserWebInitializer web自定义信息初始化 拦截器（CharsetEncodingFilter）、监听器（ComponentContextMbeanListener、DBConnectionInitializerListener）
+
+com.cdd.user.web.web.listener.ConfigServletRequestListener 配置信息请求拦截器---写入ThreadLocal
+
+请求地址：http://localhost/user-web/login/getWebConfig 获取当前请求线程中所以配置
+
+请求地址：http://localhost/user-web/login/getWebInfo 获取appName appId
