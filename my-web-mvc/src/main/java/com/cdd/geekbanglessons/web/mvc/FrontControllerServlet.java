@@ -1,7 +1,7 @@
 package com.cdd.geekbanglessons.web.mvc;
 
 import com.cdd.datastandard.Response;
-import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
+import com.cdd.dependency.injection.context.ComponentContext;
 import com.cdd.geekbanglessons.web.mvc.controller.Controller;
 import com.cdd.geekbanglessons.web.mvc.controller.PageController;
 import com.cdd.geekbanglessons.web.mvc.controller.RestController;
@@ -54,11 +54,10 @@ public class FrontControllerServlet extends HttpServlet {
      */
     @Override
     public void init(ServletConfig servletConfig) {
-        ComponentContext componentContext = new ComponentContext();
-        componentContext.init(servletConfig.getServletContext());
-        context = componentContext;
+        context = (ComponentContext) servletConfig.getServletContext().getAttribute(ComponentContext.CONTEXT_NAME);
         initHandleMethods();
         initJsonParse();
+       System.out.println(servletConfig.getInitParameterNames());
 
     }
 

@@ -1,6 +1,6 @@
 package com.cdd.user.web.web.Mbean;
 
-import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
+import com.cdd.dependency.injection.context.ComponentContext;
 
 /**
  * @author yangfengshan

@@ -2,7 +2,7 @@ package com.cdd.user.web.web.controller;
 
 import com.cdd.constants.Constants;
 import com.cdd.datastandard.Response;
-import com.cdd.geekbanglessons.web.mvc.configuration.microprofile.config.annotation.ConfigValue;
+import com.cdd.dependency.injection.configuration.annotation.ConfigValue;
 import com.cdd.geekbanglessons.web.mvc.controller.RestController;
 import com.cdd.geekbanglessons.web.mvc.valid.annotation.DataValid;
 import com.cdd.user.web.domain.User;

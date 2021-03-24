@@ -1,0 +1,8 @@
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.BooleanConverter
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.ByteConverter
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.DoubleConverter
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.FloatConverter
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.IntegerConverter
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.LongConverter
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.ShortConverter
+com.cdd.geekbanglessons.configuration.microprofile.config.converter.StringConverter

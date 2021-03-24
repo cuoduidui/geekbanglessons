@@ -1,6 +1,6 @@
 package com.cdd.user.web.orm.jpa;
 
-import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
+import com.cdd.dependency.injection.context.ComponentContext;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.*;

@@ -1,6 +1,5 @@
 package com.cdd.user.web.web.listener;
 
-import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
 import com.cdd.user.web.web.Mbean.WebContext;
 
 import javax.management.MBeanServer;
@@ -17,6 +16,13 @@ import java.util.logging.Logger;
  **/
 public class ComponentContextMbeanListener implements ServletContextListener {
     private Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private void testPropertyFromServletContext(ServletContext servletContext) {
+        String propertyName = "application.name";
+        logger.info("ServletContext Property[" + propertyName + "] : "
+                + servletContext.getInitParameter(propertyName));
+    }
+
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -35,12 +41,14 @@ public class ComponentContextMbeanListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-
-    }
-
-    private void testPropertyFromServletContext(ServletContext servletContext) {
-        String propertyName = "application.name";
-        logger.info("ServletContext Property[" + propertyName + "] : "
-                + servletContext.getInitParameter(propertyName));
+        try {
+            // 获取平台 MBean Server
+            MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = null;
+            objectName = new ObjectName("com.cdd.user.web.web.Mbean:type=WebContext");
+            mBeanServer.unregisterMBean(objectName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

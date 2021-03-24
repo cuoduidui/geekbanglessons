@@ -4,7 +4,6 @@ import com.cdd.user.web.domain.User;
 import com.cdd.user.web.sql.LocalTransactional;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityManager;
 import javax.validation.Validator;
 
 /**
@@ -12,8 +11,8 @@ import javax.validation.Validator;
  * @create 2021-03-02 10:00
  **/
 public class UserServiceImp implements UserService {
-    @Resource(name = "bean/EntityManager")
-    private EntityManager entityManager;
+//    @Resource(name = "bean/EntityManager")
+//    private EntityManager entityManager;
 
     @Resource(name = "bean/Validator")
     private Validator validator;
@@ -27,7 +26,7 @@ public class UserServiceImp implements UserService {
 //        transaction.begin();
 
         // 主调用
-        entityManager.persist(user);
+//        entityManager.persist(user);
 
         // 调用其他方法方法
         update(user); // 涉及事务

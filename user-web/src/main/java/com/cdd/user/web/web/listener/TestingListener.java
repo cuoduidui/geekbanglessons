@@ -1,6 +1,6 @@
 package com.cdd.user.web.web.listener;
 
-import com.cdd.geekbanglessons.web.mvc.context.ComponentContext;
+import com.cdd.dependency.injection.context.ComponentContext;
 import com.cdd.user.web.domain.User;
 import com.cdd.user.web.sql.DBConnectionManager;
 

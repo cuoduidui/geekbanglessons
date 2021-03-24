@@ -36,4 +36,21 @@
     <Resource name="bean/HelloWorldController" auth="Container"
               type="com.cdd.user.web.web.controller.HelloWorldController"
               factory="org.apache.naming.factory.BeanFactory"/>
+    <!--    scanClassPath 扫描所有class   scanAllDirectories扫描所有文件
+    Tomcat determines if a directory is an expanded JAR file by looking for a META-INF sub-directory.
+    Only if the META-INF sub-directory exists, the directory is assumed to be an expanded JAR file.
+    Note that for scans for matches to @HandlesTypes annotations,
+    all directories will be scanned irrespective of the presence or not of a META-INF sub-directory.
+    scanManifest="false" 识别不了该属性
+
+    -->
+    <JarScanner scanAllDirectories="true">
+        <!--        <JarScanFilter-->
+        <!--                tldSkip="jaxb-runtime*.jar,stax-ex*.jar,istack-commons-runtime*.jar,txw2*.jar,FastInfoset*.jar,jaxb-api*.jar"/>-->
+        <!--        跳过检查某包-->
+        <!--        No rules found matching 'Context/JarScanner/JarScanFilter' 不知道什么原因-->
+<!--        <JarScanFilter tldSkip="istack-commons-runtime-3.0.7.jar" pluggabilitySkip="istack-commons-runtime-3.0.7.jar"/>-->
+    </JarScanner>
+
+
 </Context>
