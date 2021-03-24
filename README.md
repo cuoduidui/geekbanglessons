@@ -76,3 +76,10 @@ com.cdd.user.web.web.listener.ConfigServletRequestListener 配置信息请求拦
 请求地址：http://localhost/user-web/login/getWebConfig 获取当前请求线程中所以配置
 
 请求地址：http://localhost/user-web/login/getWebInfo 获取appName appId
+
+备注：
+    HandlesTypes注解不同情况下的区分：
+        Tomcat determines if a directory is an expanded JAR file by looking for a META-INF sub-directory.
+        Only if the META-INF sub-directory exists, the directory is assumed to be an expanded JAR file.
+        Note that for scans for matches to @HandlesTypes annotations,
+        all directories will be scanned irrespective of the presence or not of a META-INF sub-directory
