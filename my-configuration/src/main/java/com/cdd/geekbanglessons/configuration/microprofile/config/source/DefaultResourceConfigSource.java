@@ -14,7 +14,6 @@ public class DefaultResourceConfigSource extends MapBasedConfigSource {
 
     public DefaultResourceConfigSource() {
         super("Default Config File", 100);
-        super.getProperties();
     }
 
     @Override

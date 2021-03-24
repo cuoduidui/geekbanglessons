@@ -33,7 +33,6 @@ public abstract class MapBasedConfigSource implements ConfigSource {
         Map<String, String> configData = new HashMap<>();
         try {
             prepareConfigData(configData);
-            source = configData;
         } catch (Throwable cause) {
             throw new IllegalStateException("准备配置数据发生错误", cause);
         }
@@ -60,12 +59,13 @@ public abstract class MapBasedConfigSource implements ConfigSource {
 
     @Override
     public Set<String> getPropertyNames() {
+        if (null == source) source = getProperties();
         return source.keySet();
     }
 
     @Override
     public String getValue(String propertyName) {
+        if (null == source) source = getProperties();
         return source.get(propertyName);
     }
-
 }

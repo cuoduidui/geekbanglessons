@@ -5,6 +5,7 @@ import com.cdd.dependency.injection.configuration.annotation.ConfigValue;
 import com.cdd.function.ThrowableAction;
 import com.cdd.function.ThrowableFunction;
 import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 
 import javax.annotation.PostConstruct;
@@ -74,7 +75,21 @@ public class ComponentContext {
 
     private void initConfig() {
         ConfigProviderResolver configProviderResolver = ConfigProviderResolver.instance();
+        if (null == classLoader) classLoader = Thread.currentThread().getContextClassLoader();
         config = configProviderResolver.getConfig(classLoader);
+        if (config == null) {
+            ConfigBuilder configBuilder = configProviderResolver.getBuilder();
+            // 配置 ClassLoader
+            configBuilder.forClassLoader(classLoader);
+            // 默认配置源（内建的，静态的）
+            configBuilder.addDefaultSources();
+            // 通过发现配置源（动态的）
+            configBuilder.addDiscoveredConverters();
+            // 获取 Config
+            Config config = configBuilder.build();
+            // 注册 Config 关联到当前 ClassLoader
+            configProviderResolver.registerConfig(config, classLoader);
+        }
     }
 
 

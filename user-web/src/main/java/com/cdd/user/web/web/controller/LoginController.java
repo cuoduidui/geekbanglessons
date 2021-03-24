@@ -1,8 +1,10 @@
 package com.cdd.user.web.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.cdd.constants.Constants;
 import com.cdd.datastandard.Response;
 import com.cdd.dependency.injection.configuration.annotation.ConfigValue;
+import com.cdd.geekbanglessons.web.mvc.config.ConfigUtil;
 import com.cdd.geekbanglessons.web.mvc.controller.RestController;
 import com.cdd.geekbanglessons.web.mvc.valid.annotation.DataValid;
 import com.cdd.user.web.domain.User;
@@ -37,6 +39,14 @@ public class LoginController implements RestController {
     @POST
     public Response getWebInfo() throws Throwable {
         return Response.buildSuccessResponse("appName: " + appNmae + ", appId: " + appId);
+    }
+
+    @Path("/getWebConfig")
+    @GET
+    @POST
+    public Response getWebConfig() throws Throwable {
+        Iterable<String> strings = ConfigUtil.getConfigThreadLocal().getPropertyNames();
+        return Response.buildSuccessResponse("Config: " + JSON.toJSONString(strings));
     }
 
     @Override

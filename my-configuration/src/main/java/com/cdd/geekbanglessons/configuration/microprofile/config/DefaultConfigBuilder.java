@@ -2,7 +2,6 @@ package com.cdd.geekbanglessons.configuration.microprofile.config;
 
 import com.cdd.geekbanglessons.configuration.microprofile.config.converter.Converters;
 import com.cdd.geekbanglessons.configuration.microprofile.config.source.ConfigSources;
-import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 import org.eclipse.microprofile.config.spi.Converter;
@@ -12,9 +11,12 @@ import org.eclipse.microprofile.config.spi.Converter;
  */
 public class DefaultConfigBuilder implements ConfigBuilder {
 
-    private final ConfigSources configSources;
+    private ConfigSources configSources;
 
-    private final Converters converters;
+    private Converters converters;
+
+    public DefaultConfigBuilder() {
+    }
 
     public DefaultConfigBuilder(ClassLoader classLoader) {
         this.configSources = new ConfigSources(classLoader);
@@ -65,8 +67,8 @@ public class DefaultConfigBuilder implements ConfigBuilder {
     }
 
     @Override
-    public Config build() {
-        Config config = new DefaultConfig(configSources, converters);
+    public DefaultConfig build() {
+        DefaultConfig config = new DefaultConfig(configSources, converters);
         return config;
     }
 }

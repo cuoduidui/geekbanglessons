@@ -25,5 +25,6 @@ public class UserWebInitializer extends AbstractMyWebMvcInitializer {
         servletRegistration.addMapping("/jolokia/*");
         servletContext.addListener(DBConnectionInitializerListener.class);
         servletContext.addListener(ComponentContextMbeanListener.class);
+        servletContext.addListener(ConfigServletRequestListener.class);
     }
 }

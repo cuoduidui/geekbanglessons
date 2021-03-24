@@ -41,14 +41,6 @@ public class ComponentContextMbeanListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        try {
-            // 获取平台 MBean Server
-            MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-            ObjectName objectName = null;
-            objectName = new ObjectName("com.cdd.user.web.web.Mbean:type=WebContext");
-            mBeanServer.unregisterMBean(objectName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+      
     }
 }

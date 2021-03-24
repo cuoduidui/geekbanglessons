@@ -9,7 +9,6 @@ public class OperationSystemEnvironmentVariablesConfigSource extends MapBasedCon
 
     public OperationSystemEnvironmentVariablesConfigSource() {
         super("Operation System Environment Variables", 300);
-        super.getProperties();
     }
 
     @Override
