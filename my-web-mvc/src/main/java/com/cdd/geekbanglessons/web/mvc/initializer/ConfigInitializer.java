@@ -30,6 +30,8 @@ public class ConfigInitializer extends AbstractMyWebMvcInitializer {
         configBuilder.addDefaultSources();
         // 通过发现配置源（动态的）
         configBuilder.addDiscoveredConverters();
+        // 通过发现配置源（动态的）
+        configBuilder.addDiscoveredConverters();
         // 增加扩展配置源（基于 Servlet 引擎）
         configBuilder.withSources(servletContextConfigSource);
         // 获取 Config
