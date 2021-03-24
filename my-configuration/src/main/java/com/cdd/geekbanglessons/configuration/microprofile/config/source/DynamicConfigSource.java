@@ -11,6 +11,7 @@ public class DynamicConfigSource extends MapBasedConfigSource {
 
     public DynamicConfigSource() {
         super("DynamicConfigSource", 500);
+        super.getProperties();
     }
 
     @Override

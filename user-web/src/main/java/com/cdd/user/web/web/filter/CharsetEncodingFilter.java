@@ -25,11 +25,11 @@ public class CharsetEncodingFilter implements Filter {
                          ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         if (request instanceof HttpServletRequest) {
-            HttpServletRequest httpRequest = (HttpServletRequest) request;
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
-            httpRequest.setCharacterEncoding(encoding);
-            httpResponse.setCharacterEncoding(encoding);
-            servletContext.log("当前编码已设置为：" + encoding);
+//            HttpServletRequest httpRequest = (HttpServletRequest) request;
+//            HttpServletResponse httpResponse = (HttpServletResponse) response;
+//            httpRequest.setCharacterEncoding(encoding);
+//            httpResponse.setCharacterEncoding(encoding);
+//            servletContext.log("当前编码已设置为：" + encoding);
             // CharsetEncodingFilter -> FrontControllerServlet -> forward -> index.jsp
         }
 

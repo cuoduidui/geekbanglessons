@@ -27,9 +27,9 @@ import java.util.ServiceLoader;
 public class LoginController implements RestController {
     @Resource(name = "bean/UserService")
     private UserService userService;
-    @ConfigValue("appName")
+    @ConfigValue("application.appName")
     private String appNmae;
-    @ConfigValue("appId")
+    @ConfigValue("application.appId")
     private Integer appId;
 
     @Path("/getWebInfo")

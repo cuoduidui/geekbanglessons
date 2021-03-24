@@ -57,7 +57,7 @@ public class FrontControllerServlet extends HttpServlet {
         context = (ComponentContext) servletConfig.getServletContext().getAttribute(ComponentContext.CONTEXT_NAME);
         initHandleMethods();
         initJsonParse();
-       System.out.println(servletConfig.getInitParameterNames());
+        System.out.println(servletConfig.getInitParameterNames());
 
     }
 

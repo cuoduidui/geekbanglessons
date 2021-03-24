@@ -6,6 +6,7 @@ public class JavaSystemPropertiesConfigSource extends MapBasedConfigSource {
 
     public JavaSystemPropertiesConfigSource() {
         super("Java System Properties", 400);
+        super.getProperties();
     }
 
     /**

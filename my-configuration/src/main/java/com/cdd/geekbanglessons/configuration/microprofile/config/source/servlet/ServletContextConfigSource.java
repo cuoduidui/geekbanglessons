@@ -13,10 +13,12 @@ public class ServletContextConfigSource extends MapBasedConfigSource {
     public ServletContextConfigSource(ServletContext servletContext) {
         super("ServletContext Init Parameters", 500);
         this.servletContext = servletContext;
+        super.getProperties();
     }
 
     @Override
     protected void prepareConfigData(Map configData) throws Throwable {
+        if (servletContext == null) return;
         Enumeration<String> parameterNames = servletContext.getInitParameterNames();
         while (parameterNames.hasMoreElements()) {
             String parameterName = parameterNames.nextElement();
