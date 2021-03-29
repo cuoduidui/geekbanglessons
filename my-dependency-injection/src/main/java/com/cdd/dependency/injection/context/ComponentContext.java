@@ -13,15 +13,17 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.naming.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * 组件上下文（Web 应用全局使用）
  */
-public class ComponentContext {
+public class ComponentContext implements IComponentContext {
 
     public static final String CONTEXT_NAME = ComponentContext.class.getName();
 
@@ -46,6 +48,10 @@ public class ComponentContext {
     private Config config;
 
     private Map<String, Object> componentsMap = new LinkedHashMap<>();
+    /**
+     * @PreDestroy 方法缓存，Key 为标注方法，Value 为方法所属对象
+     */
+    private Map<Method, Object> preDestroyMethodCache = new LinkedHashMap<>();
 
     public void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -66,11 +72,29 @@ public class ComponentContext {
         }
     }
 
+    @Override
     public void init() throws RuntimeException {
         initConfig();
         initEnvContext();
         instantiateComponents();
         initializeComponents();
+        registerShutdownHook();
+    }
+
+    private void registerShutdownHook() {
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            processPreDestroy();
+        }));
+    }
+
+    private void processPreDestroy() {
+        for (Method preDestroyMethod : preDestroyMethodCache.keySet()) {
+            // 移除集合中的对象，防止重复执行 @PreDestroy 方法
+            Object component = preDestroyMethodCache.remove(preDestroyMethod);
+            // 执行目标方法
+            ThrowableAction.execute(() -> preDestroyMethod.invoke(component));
+        }
     }
 
     private void initConfig() {
@@ -114,16 +138,57 @@ public class ComponentContext {
      * </ol>
      */
     protected void initializeComponents() {
-        componentsMap.values().forEach(component -> {
-            Class<?> componentClass = component.getClass();
-            // 注入阶段 - {@link Resource}
-            injectComponents(component, componentClass);
-            // 初始阶段 - {@link PostConstruct}
-//            processPostConstruct(component, componentClass);
-        });
+        componentsMap.values().forEach(this::initializeComponent);
     }
 
-    private void injectComponents(Object component, Class<?> componentClass) {
+    /**
+     * 初始化组件（支持 Java 标准 Commons Annotation 生命周期）
+     * <ol>
+     * <li>注入阶段 - {@link Resource}</li>
+     * <li>初始阶段 - {@link PostConstruct}</li>
+     * <li>销毁阶段 - {@link PreDestroy}</li>
+     * </ol>
+     */
+    public void initializeComponent(Object component) {
+        Class<?> componentClass = component.getClass();
+        // 注入阶段 - {@link Resource}
+        injectComponent(component, componentClass);
+        // 查询候选方法
+        List<Method> candidateMethods = findCandidateMethods(componentClass);
+        // 初始阶段 - {@link PostConstruct}
+        processPostConstruct(component, candidateMethods);
+        // 本阶段处理 {@link PreDestroy} 方法元数据
+        processPreDestroyMetadata(component, candidateMethods);
+    }
+
+    /**
+     * @param component        组件对象
+     * @param candidateMethods 候选方法
+     * @see #processPreDestroy()
+     */
+    private void processPreDestroyMetadata(Object component, List<Method> candidateMethods) {
+        candidateMethods.stream()
+                .filter(method -> method.isAnnotationPresent(PreDestroy.class)) // 标注 @PreDestroy
+                .forEach(method -> {
+                    preDestroyMethodCache.put(method, component);
+                });
+    }
+
+    /**
+     * 获取组件类中的候选方法
+     *
+     * @param componentClass 组件类
+     * @return non-null
+     */
+    private List<Method> findCandidateMethods(Class<?> componentClass) {
+        return Stream.of(componentClass.getMethods())                     // public 方法
+                .filter(method ->
+                        !Modifier.isStatic(method.getModifiers()) &&      // 非 static
+                                method.getParameterCount() == 0)          // 无参数
+                .collect(Collectors.toList());
+    }
+
+    private void injectComponent(Object component, Class<?> componentClass) {
         Stream.of(componentClass.getDeclaredFields())
                 .filter(field -> {
                     int mods = field.getModifiers();
@@ -162,20 +227,14 @@ public class ComponentContext {
         }
     }
 
-    private void processPostConstruct(Object component, Class<?> componentClass) {
-        Stream.of(componentClass.getMethods())
-                .filter(method ->
-                        !Modifier.isStatic(method.getModifiers()) &&      // 非 static
-                                method.getParameterCount() == 0 &&        // 没有参数
-                                method.isAnnotationPresent(PostConstruct.class) // 标注 @PostConstruct
-                ).forEach(method -> {
-            // 执行目标方法
-            try {
-                method.invoke(component);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+    private void processPostConstruct(Object component, List<Method> candidateMethods) {
+        candidateMethods
+                .stream()
+                .filter(method -> method.isAnnotationPresent(PostConstruct.class))// 标注 @PostConstruct
+                .forEach(method -> {
+                    // 执行目标方法
+                    ThrowableAction.execute(() -> method.invoke(component));
+                });
     }
 
     /**
@@ -229,6 +288,7 @@ public class ComponentContext {
      * @param <C>
      * @return
      */
+    @Override
     public <C> C getComponent(String name) {
         return (C) componentsMap.get(name);
     }
@@ -238,6 +298,7 @@ public class ComponentContext {
      *
      * @return
      */
+    @Override
     public List<String> getComponentNames() {
         return new ArrayList<>(componentsMap.keySet());
     }
@@ -275,6 +336,7 @@ public class ComponentContext {
         });
     }
 
+    @Override
     public void destroy() throws RuntimeException {
         close(this.envContext);
     }
