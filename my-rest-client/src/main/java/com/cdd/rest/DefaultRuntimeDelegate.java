@@ -31,7 +31,6 @@ public class DefaultRuntimeDelegate extends RuntimeDelegate {
 
     @Override
     public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) throws IllegalArgumentException {
-        //todo 实现
         return new DefaultHeaderDelegate();
     }
 

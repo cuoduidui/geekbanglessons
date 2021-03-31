@@ -23,7 +23,7 @@ public class UserWebInitializer extends AbstractMyWebMvcInitializer {
         filterRegistration.addMappingForUrlPatterns(dispatcherTypes, true, "/*");
         ServletRegistration.Dynamic servletRegistration = servletContext.addServlet("jolokia-agent", "org.jolokia.http.AgentServlet");
         servletRegistration.addMapping("/jolokia/*");
-        servletContext.addListener(DBConnectionInitializerListener.class);
+//        servletContext.addListener(DBConnectionInitializerListener.class);
         servletContext.addListener(ComponentContextMbeanListener.class);
         servletContext.addListener(ConfigServletRequestListener.class);
     }
