@@ -101,3 +101,6 @@ http://localhost/user-web/hello/login 登录页面
 ​													2、运行测试类``com.cdd.rest.demo.RestClientDemo#main``
 
 标注：本次解决``com.cdd.user.web.orm.jpa.DelegatingEntityManager`` bean创建失败的bug : ```persistence.xml``` version 版本导致  2.2->2.1
+
+2、补全代码:
+    ``com.cdd.messaging.reactive.streams.SimpleProcessor``
