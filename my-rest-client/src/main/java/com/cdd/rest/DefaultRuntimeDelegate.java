@@ -31,11 +31,25 @@ public class DefaultRuntimeDelegate extends RuntimeDelegate {
 
     @Override
     public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) throws IllegalArgumentException {
-        return null;
+        //todo 实现
+        return new DefaultHeaderDelegate();
     }
 
     @Override
     public Link.Builder createLinkBuilder() {
         return null;
+    }
+
+    class DefaultHeaderDelegate implements HeaderDelegate {
+
+        @Override
+        public Object fromString(String s) {
+            return (Object) s;
+        }
+
+        @Override
+        public String toString(Object o) {
+            return o.toString();
+        }
     }
 }

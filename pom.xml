@@ -178,13 +178,17 @@
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
-
-            <!-- Hibernate Validator -->
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${hibernate.validator.version}</version>
             </dependency>
+            <!-- Hibernate Validator -->
+<!--            <dependency>-->
+            <!--                <groupId>org.hibernate</groupId>-->
+            <!--                <artifactId>hibernate-validator</artifactId>-->
+            <!--                <version>${hibernate.validator.version}</version>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>org.glassfish</groupId>
@@ -232,6 +236,11 @@
                 <version>${jolokia.version}</version>
             </dependency>
             <!-- jolokia结束-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.70</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>

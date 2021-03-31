@@ -68,6 +68,13 @@ public class LoginController implements RestController {
         return Response.buildFailResponse(Constants.ResponseCode.UNKNOWN_ERROR, Constants.ResponseInfo.UNKNOWN_ERROR, Constants.ResponseInfo.UNKNOWN_ERROR);
     }
 
+    @Path("/testPost")
+    @GET
+    @POST
+    public Response testPost(String msg) {
+        return Response.buildSuccessResponse(msg);
+    }
+
     public String getFristData(String[] datas) {
         if (null == datas || datas.length == 0) return null;
         return datas[0];
