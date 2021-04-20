@@ -51,7 +51,7 @@ public class FileFallbackStorageTest {
         assertEquals(2, map.get("b"));
         assertEquals(3, map.get("c"));
 
-        instance.write(ExpirableEntry.of("a", new Object()));
+        instance.write(ExpirableEntry.of("a", "sad"));
     }
 
     @After

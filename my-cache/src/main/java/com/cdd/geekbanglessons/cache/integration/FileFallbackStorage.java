@@ -32,7 +32,7 @@ import static java.lang.String.format;
  */
 public class FileFallbackStorage extends AbstractFallbackStorage<Object, Object> {
 
-    private static final File CACHE_FALLBACK_DIRECTORY = new File(".cache/fallback/");
+    private static final File CACHE_FALLBACK_DIRECTORY = new File(".cache\\fallback\\");
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
